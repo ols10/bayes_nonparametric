@@ -13,12 +13,12 @@ set.seed(539)
 N <- c(400, 900, 1600, 2500, 4900) # sample size
 p_dim <- c(4, 100)
 reps <- 1000
-seeds = sample(1e7, reps)
-g_val = c("correct", "incorrect")
-m_val = c("correct", "incorrect")
-prior_dist = c("correct_small", "correct_large", "incorrect_small", "incorrect_large")
+seeds <- sample(1e7, reps)
+g_val <- c("correct", "incorrect")
+m_val <- c("correct", "incorrect")
+prior_dist <- c("correct_small", "correct_large", "incorrect_small", "incorrect_large")
 
-tasks = expand.grid(g_val = g_val, m_val = m_val,
+tasks <- expand.grid(g_val = g_val, m_val = m_val,
                     prior = prior_dist, seed = seeds, N = N, p_dim = p_dim,
                     stringsAsFactors = FALSE)
 
@@ -31,11 +31,11 @@ load('true.rds')
 sim <- function(i) {
 
     set.seed(tasks[i, 'seed'])
-    n = tasks[i, 'N']
-    g_val = tasks[i, 'g_val']
-    m_val = tasks[i, 'm_val']
-    prior = tasks[i, 'prior']
-    p_dim = tasks[i, 'p_dim']
+    n <- tasks[i, 'N']
+    g_val <- tasks[i, 'g_val']
+    m_val <- tasks[i, 'm_val']
+    prior <- tasks[i, 'prior']
+    p_dim <- tasks[i, 'p_dim']
 
     p_miss <- round(p_dim / 2, 0)
 
@@ -59,7 +59,7 @@ sim <- function(i) {
                     newdata = X[, 1:p_miss], type = 'response')
     }
 
-    theta_init = true_theta[true_theta[, 'p'] == p_dim, 'truth']
+    theta_init <- true_theta[true_theta[, 'p'] == p_dim, 'truth']
 
     if (prior == "correct_small") {
         beta_res <- beta_reparam(theta_init, 0.1*(1 - theta_init)*theta_init)
@@ -88,11 +88,11 @@ sim <- function(i) {
         }
 
         if (m_val == "correct") {
-            m_fit = MCMClogit(Y[L == 1] ~ ., data = X[L == 1, ], b0 = 0, B0 = 0.01)
-            m_mat = as.matrix(m_fit) %*% t(as.matrix(cbind(rep(1, n), X)))
+            m_fit <- MCMClogit(Y[L == 1] ~ ., data = X[L == 1, ], b0 = 0, B0 = 0.01)
+            m_mat <- as.matrix(m_fit) %*% t(as.matrix(cbind(rep(1, n), X)))
         } else {
-            m_fit = MCMClogit(Y[L == 1] ~ ., data = X[L == 1, 1:p_miss], b0 = 0, B0 = 0.01)
-            m_mat = as.matrix(m_fit) %*% t(as.matrix(cbind(rep(1, n), X[, 1:p_miss])))
+            m_fit <- MCMClogit(Y[L == 1] ~ ., data = X[L == 1, 1:p_miss], b0 = 0, B0 = 0.01)
+            m_mat <- as.matrix(m_fit) %*% t(as.matrix(cbind(rep(1, n), X[, 1:p_miss])))
         }
 
         theta_mat <- (1 - plogis(g_mat)) * plogis(m_mat)
@@ -102,7 +102,7 @@ sim <- function(i) {
         theta_post <- NULL
     }
 
-    out = list(posterior_est = pp, g_val = g_val, m_val = m_val, prior = prior, n = n, p = p_dim,
+    out <- list(posterior_est = pp, g_val = g_val, m_val = m_val, prior = prior, n = n, p = p_dim,
                param_post = theta_post)
 
     return(out)
@@ -121,5 +121,3 @@ funslave <- function(j){
     return(out)
 
 }
-
-
